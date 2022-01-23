@@ -1,4 +1,4 @@
-# bgweb-api
+# Backgammon Web API
 
 Backgammon Web API. Sophisticed neural net based multi-ply evalution engine for Backgammon moves.
 
