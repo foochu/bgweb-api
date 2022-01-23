@@ -12,7 +12,13 @@ Features to-do:
 
 - Calculate cube decisions
 
-## Running the application
+***
+
+**Want to see the Backgammon Web API in action?** Have a look at https://github.com/foochu/bgweb-terminal.
+
+***
+
+## Running the API server
 
 ### Run via Docker
 
