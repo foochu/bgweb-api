@@ -185,6 +185,8 @@ Return moves in order of preference based on equity and winning chance:
 
 ## Web Assembly
 
+Web Assembly allows to run the API functions directly in the browser without a need for backend server. Logic, runtime & data files are all bundled into a single file.
+
 Build wasm:
 
 ```sh
