@@ -21,12 +21,12 @@ import (
 // @license.url /license
 
 // @BasePath /api/v1
-// @schemes http
+// @schemes http https
 func main() {
 	var dataDir = readEnv("BGWEB_DATADIR", "./data")
 	var port = readEnv("BGWEB_PORT", "8080")
 
-	if err := gnubg.Init(dataDir); err != nil {
+	if err := gnubg.Init(os.DirFS(dataDir)); err != nil {
 		panic(err)
 	}
 

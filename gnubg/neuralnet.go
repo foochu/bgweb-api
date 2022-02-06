@@ -3,7 +3,7 @@ package gnubg
 import (
 	"bgweb-api/gnubg/sigmoid"
 	"fmt"
-	"os"
+	"io/fs"
 )
 
 const _WEIGHTS_VERSION = "1.00"
@@ -64,13 +64,13 @@ func neuralNetDestroy(pnn *_NeuralNet) {
 	pnn.arOutputThreshold = nil
 }
 
-func verifyWeights(pf *os.File) error {
+func verifyWeights(pf fs.File, szFilename string) error {
 	var file_version string
 	if n, err := fmt.Fscanf(pf, "GNU Backgammon %15s\n", &file_version); n != 1 || err != nil {
-		return fmt.Errorf("%v is not a weights file: %v/%v", pf.Name(), n, err)
+		return fmt.Errorf("%v is not a weights file: %v/%v", szFilename, n, err)
 	}
 	if file_version != _WEIGHTS_VERSION {
-		return fmt.Errorf("weights file %v, has incorrect version (%v), expected (%v)", pf.Name(), file_version, _WEIGHTS_VERSION)
+		return fmt.Errorf("weights file %v, has incorrect version (%v), expected (%v)", szFilename, file_version, _WEIGHTS_VERSION)
 	}
 	return nil
 }
@@ -270,7 +270,7 @@ func evaluateFromBase(pnn *_NeuralNet, arInputDif *[_NUM_INPUTS]float32, ar []fl
 	}
 }
 
-func neuralNetLoad(pnn *_NeuralNet, pf *os.File) error {
+func neuralNetLoad(pnn *_NeuralNet, pf fs.File) error {
 	var dummy string
 
 	items, err := fmt.Fscanf(pf, "%d %d %d %s %f %f\n", &pnn.cInput, &pnn.cHidden, &pnn.cOutput, &dummy, &pnn.rBetaHidden, &pnn.rBetaOutput)

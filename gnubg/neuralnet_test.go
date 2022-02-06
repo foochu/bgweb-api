@@ -10,7 +10,7 @@ func openFile(filename string) *os.File {
 	if err != nil {
 		panic(err)
 	}
-	if err = verifyWeights(f); err != nil {
+	if err = verifyWeights(f, filename); err != nil {
 		panic(err)
 	}
 	return f

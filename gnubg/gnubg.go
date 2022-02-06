@@ -2,7 +2,7 @@ package gnubg
 
 import (
 	"fmt"
-	"path/filepath"
+	"io/fs"
 )
 
 type TanBoard _TanBoard
@@ -30,14 +30,18 @@ type EvalInfo struct {
 	Plies   int
 }
 
-func Init(dataDir string) error {
-	initMatchEquity(filepath.Join(dataDir, "./met/Kazaross-XG2.xml"))
+func Init(dataDir fs.FS) error {
+	initMatchEquity(dataDir, "met/Kazaross-XG2.xml")
 
 	if err := evalInitialise(dataDir); err != nil {
 		return fmt.Errorf("error in evalInitialise(): %v", err)
 	}
 
 	return nil
+}
+
+func Destroy() {
+	evalShutdown()
 }
 
 func FindMoves(board TanBoard, dice [2]int, player int, scoreMoves bool, cubeful bool) (MoveList, error) {

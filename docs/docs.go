@@ -347,7 +347,7 @@ var SwaggerInfo = swaggerInfo{
 	Version:     "1.0",
 	Host:        "",
 	BasePath:    "/api/v1",
-	Schemes:     []string{"http"},
+	Schemes:     []string{"http", "https"},
 	Title:       "BGWeb API",
 	Description: "BGWeb API",
 }

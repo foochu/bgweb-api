@@ -4,9 +4,8 @@ import (
 	"bgweb-api/gnubg/math32"
 	"crypto/md5"
 	"fmt"
+	"io/fs"
 	"math/bits"
-	"os"
-	"path/filepath"
 	"sort"
 )
 
@@ -450,7 +449,7 @@ func msb32(n int) int {
 	return 31 - bits.LeadingZeros32(uint32(n))
 }
 
-func evalInitialise(dataDir string) error {
+func evalInitialise(dataDir fs.FS) error {
 	cCache = 0x1 << _CACHE_SIZE_DEFAULT
 	if err := cacheCreate(&cEval, cCache); err != nil {
 		return fmt.Errorf("error while creating cache: %v", err)
@@ -470,41 +469,43 @@ func evalInitialise(dataDir string) error {
 	var err error
 
 	if pbc1 == nil {
-		pbc1, err = bearoffInit(filepath.Join(dataDir, "./gnubg_os0.bd"), _BO_MUST_BE_ONE_SIDED)
+		pbc1, err = bearoffInit(dataDir, "gnubg_os0.bd", _BO_MUST_BE_ONE_SIDED)
 		if err != nil {
-			logWarningf("creating a heuristic bearoff database as a fallback, reason: %v", err)
-			pbc1, err = bearoffInit("", _BO_HEURISTIC)
-			if err != nil {
-				return fmt.Errorf("unable to create any type of bearoff database: %v", err)
-			}
+			// logWarningf("creating a heuristic bearoff database as a fallback, reason: %v", err)
+			// pbc1, err = bearoffInit(dataDir, "", _BO_HEURISTIC)
+			// if err != nil {
+			// 	return fmt.Errorf("unable to create any type of bearoff database: %v", err)
+			// }
+			return fmt.Errorf("error while reading bearoff database: %v", err)
 		}
 	}
 
 	/* read two-sided db from gnubg.bd */
-	pbc2, err = bearoffInit(filepath.Join(dataDir, "./gnubg_ts0.bd"), _BO_MUST_BE_TWO_SIDED)
+	pbc2, err = bearoffInit(dataDir, "gnubg_ts0.bd", _BO_MUST_BE_TWO_SIDED)
 	if err != nil {
 		logWarningf("will not use the two-sided bearoff database: %v", err)
 	}
 	/* init one-sided db */
-	pbcOS, _ = bearoffInit(filepath.Join(dataDir, "./gnubg_os.bd"), _BO_MUST_BE_ONE_SIDED)
+	pbcOS, _ = bearoffInit(dataDir, "gnubg_os.bd", _BO_MUST_BE_ONE_SIDED)
 
 	/* init two-sided db */
-	pbcTS, _ = bearoffInit(filepath.Join(dataDir, "./gnubg_ts.bd"), _BO_MUST_BE_TWO_SIDED)
+	pbcTS, _ = bearoffInit(dataDir, "gnubg_ts.bd", _BO_MUST_BE_TWO_SIDED)
 
 	/* hyper-gammon databases */
 
 	for i := 0; i < 3; i++ {
-		fn := fmt.Sprintf(filepath.Join(dataDir, "./hyper%1d.bd"), i+1)
-		apbcHyper[i], _ = bearoffInit(fn, _BO_NONE)
+		fn := fmt.Sprintf("hyper%1d.bd", i+1)
+		apbcHyper[i], _ = bearoffInit(dataDir, fn, _BO_NONE)
 	}
 
-	pfWeights, err := os.OpenFile(filepath.Join(dataDir, "./gnubg.weights"), os.O_RDONLY, 0644)
+	weightsFile := "gnubg.weights"
+	pfWeights, err := dataDir.Open(weightsFile)
 	if err != nil {
-		return fmt.Errorf("error while opening weights file: %v", err)
+		return fmt.Errorf("error while opening weights file %v: %v", weightsFile, err)
 	}
 	defer pfWeights.Close()
 
-	if err = verifyWeights(pfWeights); err != nil {
+	if err = verifyWeights(pfWeights, weightsFile); err != nil {
 		return fmt.Errorf("error while verifying weights file: %v", err)
 	}
 

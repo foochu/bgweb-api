@@ -1,12 +1,15 @@
 package gnubg
 
 import (
+	"io/fs"
+	"os"
 	"reflect"
 	"testing"
 )
 
 func Test_bearoffInit(t *testing.T) {
 	type args struct {
+		dataDir    fs.FS
 		szFilename string
 		bo         int
 	}
@@ -19,7 +22,8 @@ func Test_bearoffInit(t *testing.T) {
 		{
 			name: "should init one-sided",
 			args: args{
-				szFilename: "../data/gnubg_os0.bd",
+				dataDir:    os.DirFS("../data"),
+				szFilename: "gnubg_os0.bd",
 				bo:         _BO_MUST_BE_ONE_SIDED,
 			},
 			want: &_BearOffContext{
@@ -31,7 +35,7 @@ func Test_bearoffInit(t *testing.T) {
 				fND:         false,
 				fHeuristic:  false,
 				fCubeful:    false,
-				szFilename:  "../data/gnubg_os0.bd",
+				szFilename:  "gnubg_os0.bd",
 				p:           nil,
 			},
 			wantErr: false,
@@ -39,7 +43,8 @@ func Test_bearoffInit(t *testing.T) {
 		{
 			name: "should init two-sided",
 			args: args{
-				szFilename: "../data/gnubg_ts0.bd",
+				dataDir:    os.DirFS("../data"),
+				szFilename: "gnubg_ts0.bd",
 				bo:         _BO_MUST_BE_TWO_SIDED,
 			},
 			want: &_BearOffContext{
@@ -51,7 +56,7 @@ func Test_bearoffInit(t *testing.T) {
 				fND:         false,
 				fHeuristic:  false,
 				fCubeful:    true,
-				szFilename:  "../data/gnubg_ts0.bd",
+				szFilename:  "gnubg_ts0.bd",
 				p:           nil,
 			},
 			wantErr: false,
@@ -59,7 +64,7 @@ func Test_bearoffInit(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := bearoffInit(tt.args.szFilename, tt.args.bo)
+			got, err := bearoffInit(tt.args.dataDir, tt.args.szFilename, tt.args.bo)
 			if err != nil {
 				bearoffClose(got)
 			}
@@ -100,7 +105,8 @@ func Test_bearoffInit(t *testing.T) {
 // }
 
 func Test_bearoffDist(t *testing.T) {
-	pbc, err := bearoffInit("../data/gnubg_os0.bd", _BO_MUST_BE_ONE_SIDED)
+	dataDir := os.DirFS("../data")
+	pbc, err := bearoffInit(dataDir, "gnubg_os0.bd", _BO_MUST_BE_ONE_SIDED)
 	if err != nil {
 		panic(err)
 	}

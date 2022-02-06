@@ -4,8 +4,8 @@ import (
 	"bgweb-api/gnubg/math32"
 	"bgweb-api/gnubg/met"
 	"encoding/xml"
+	"io/fs"
 	"io/ioutil"
-	"os"
 )
 
 const _MAXSCORE = 64
@@ -74,10 +74,10 @@ const (
 
 // var miCurrent *met.METInfo
 
-func readMET(met *met.METData, filename string) int {
+func readMET(met *met.METData, dataDir fs.FS, filename string) int {
 	met.Info.FileName = filename
 
-	xmlFile, err := os.Open(filename)
+	xmlFile, err := dataDir.Open(filename)
 	if err != nil {
 		panic(err)
 	}
@@ -102,11 +102,11 @@ func readMET(met *met.METData, filename string) int {
 	return 0
 }
 
-func initMatchEquity(szFileName string) {
+func initMatchEquity(dataDir fs.FS, szFileName string) {
 	md := met.METData{}
 
 	/* Read match equity table from XML file */
-	if readMET(&md, szFileName) != 0 { /* load failed - make default as must have a met */
+	if readMET(&md, dataDir, szFileName) != 0 { /* load failed - make default as must have a met */
 		// TODO: getDefaultMET(&md)
 		panic("readMET() != 0")
 	}

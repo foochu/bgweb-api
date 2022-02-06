@@ -4,26 +4,20 @@ import (
 	"bgweb-api/gnubg"
 	"os"
 	"reflect"
+	"sync"
 	"testing"
 )
 
-func TestMain(m *testing.M) {
-	before()
-	defer after()
-	os.Exit(m.Run())
-}
+var once sync.Once
 
-func before() {
-	if err := gnubg.Init("../data"); err != nil {
+func setup() {
+	if err := gnubg.Init(os.DirFS("../data")); err != nil {
 		panic(err)
 	}
 }
 
-func after() {
-	// evalShutdown()
-}
-
 func TestGetMoves(t *testing.T) {
+	once.Do(setup)
 	type args struct {
 		args MoveArgs
 	}

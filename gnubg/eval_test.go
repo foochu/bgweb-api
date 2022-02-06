@@ -4,27 +4,22 @@ import (
 	"math"
 	"os"
 	"reflect"
+	"sync"
 	"testing"
 )
 
-func TestMain(m *testing.M) {
-	before()
-	defer after()
-	os.Exit(m.Run())
-}
+var once sync.Once
 
-func before() {
-	initMatchEquity("../data/met/Kazaross-XG2.xml")
-	if err := evalInitialise("../data"); err != nil {
+func setup() {
+	dataDir := os.DirFS("../data")
+	initMatchEquity(dataDir, "met/Kazaross-XG2.xml")
+	if err := evalInitialise(dataDir); err != nil {
 		panic(err)
 	}
 }
 
-func after() {
-	evalShutdown()
-}
-
 func Test_generateMoves(t *testing.T) {
+	once.Do(setup)
 	type args struct {
 		board    _TanBoard
 		n0, n1   int
@@ -111,6 +106,7 @@ func Test_generateMoves(t *testing.T) {
 }
 
 func Test_scoreMoves(t *testing.T) {
+	once.Do(setup)
 	type args struct {
 		moves []_Move
 	}
@@ -153,6 +149,7 @@ func Test_scoreMoves(t *testing.T) {
 }
 
 func Test_findnSaveBestMoves(t *testing.T) {
+	once.Do(setup)
 	var eval = func(nDice0 int, nDice1 int, anBoard _TanBoard) (*_Move, error) {
 		var pml = _MoveList{}
 		var pci = _CubeInfo{
@@ -246,6 +243,7 @@ func Test_findnSaveBestMoves(t *testing.T) {
 }
 
 func Test_evaluatePositionFull(t *testing.T) {
+	once.Do(setup)
 	type args struct {
 		nnStates *[3]_NNState
 		anBoard  _TanBoard
@@ -290,6 +288,7 @@ func Test_evaluatePositionFull(t *testing.T) {
 }
 
 func Test_msb32(t *testing.T) {
+	once.Do(setup)
 	type args struct {
 		n int
 	}
@@ -319,6 +318,7 @@ func Test_msb32(t *testing.T) {
 }
 
 func Test_evalContact(t *testing.T) {
+	once.Do(setup)
 	type args struct {
 		anBoard _TanBoard
 	}
@@ -354,6 +354,7 @@ func Test_evalContact(t *testing.T) {
 }
 
 func Test_calculateContactInputs(t *testing.T) {
+	once.Do(setup)
 	type args struct {
 		anBoard _TanBoard
 	}
@@ -422,6 +423,7 @@ func Test_calculateContactInputs(t *testing.T) {
 }
 
 func Test_calculateHalfInputs(t *testing.T) {
+	once.Do(setup)
 	type args struct {
 		anBoard    [25]int
 		anBoardOpp [25]int
@@ -458,6 +460,7 @@ func Test_calculateHalfInputs(t *testing.T) {
 }
 
 func Test_escapes(t *testing.T) {
+	once.Do(setup)
 	type args struct {
 		anBoard [25]int
 		n       int

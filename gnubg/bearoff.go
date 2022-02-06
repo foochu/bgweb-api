@@ -3,7 +3,7 @@ package gnubg
 import (
 	"bgweb-api/gnubg/math32"
 	"fmt"
-	"os"
+	"io/fs"
 	"strconv"
 )
 
@@ -47,7 +47,7 @@ func atoi(s string) int {
 	return i
 }
 
-func bearoffInit(szFilename string, bo int) (*_BearOffContext, error) {
+func bearoffInit(dataDir fs.FS, szFilename string, bo int) (*_BearOffContext, error) {
 	var pbc _BearOffContext
 
 	if bo&_BO_HEURISTIC > 0 {
@@ -65,7 +65,7 @@ func bearoffInit(szFilename string, bo int) (*_BearOffContext, error) {
 	}
 	pbc.szFilename = szFilename
 
-	sz, err := os.ReadFile(szFilename)
+	sz, err := fs.ReadFile(dataDir, szFilename)
 	if err != nil {
 		invalidDb(&pbc)
 		return nil, fmt.Errorf("error while reading bearoff database: %v", err)
