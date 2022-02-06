@@ -4,14 +4,14 @@ WORKDIR /app
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" .
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" ./cmd/bgweb-api
 
 FROM scratch
 
 WORKDIR /app
 
 COPY --from=builder /app/bgweb-api /usr/bin/
-COPY --from=builder /app/data/ /var/lib/bgweb-api/data/
+COPY --from=builder /app/cmd/bgweb-api/data/ /var/lib/bgweb-api/data/
 
 ENV BGWEB_DATADIR=/var/lib/bgweb-api/data
 

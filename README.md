@@ -12,13 +12,13 @@ Features to-do:
 
 - Calculate cube decisions
 
-***
+---
 
 **Want to see the Backgammon Web API in action?** Have a look at https://github.com/foochu/bgweb-terminal.
 
-***
+---
 
-## Running the API server
+## Running the REST API server
 
 ### Run via Docker
 
@@ -181,4 +181,63 @@ Return moves in order of preference based on equity and winning chance:
     }
   }
 ]
+```
+
+## Web Assembly
+
+Build wasm:
+
+```sh
+# 1 - install Go
+
+# 2 - clone this repo
+
+# 3 - build wasm
+./scripts/buildwasm.sh
+
+# 4 - generates `lib.wasm`
+```
+
+In your web app:
+
+```js
+const go = new Go();
+
+WebAssembly.instantiateStreaming(fetch("lib.wasm"), go.importObject).then(
+  async (result) => {
+    await go.run(result.instance);
+  }
+);
+```
+
+Web Assembly declares global JS function `wasm_get_moves()`. Example usage:
+
+```ts
+let input = JSON.stringify({
+  board: {
+    o: {
+      "6": 5,
+      "8": 3,
+      "13": 5,
+      "24": 2,
+    },
+    x: {
+      "6": 5,
+      "8": 3,
+      "13": 5,
+      "24": 2,
+    },
+  },
+  cubeful: false,
+  dice: [3, 1],
+  "max-moves": 3,
+  player: "x",
+  "score-moves": true,
+});
+
+let output = global.wasm_get_moves(input);
+
+let moves = JSON.parse(output);
+
+console.log(moves);
 ```
