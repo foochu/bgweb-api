@@ -39,7 +39,7 @@ docker run -p 8080:8080 -d foochu/bgweb-api:latest
 # 2 - clone this repo
 
 # 3 - run the program:
-go run .
+go run ./cmd/bgweb-api
 
 # 4 - browse to http://localhost:8080
 ```
