@@ -1,6 +1,6 @@
 # Backgammon Web API
 
-Backgammon Web API. Sophisticed neural net based multi-ply evalution engine for Backgammon moves.
+Backgammon Web API. Sophisticated neural net based multi-ply evalution engine for Backgammon moves.
 
 Based on GNU Backgammon (https://www.gnu.org/software/gnubg) under GPL license.
 
