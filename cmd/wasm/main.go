@@ -3,6 +3,7 @@ package main
 import (
 	"bgweb-api/internal/api"
 	"bgweb-api/internal/gnubg"
+	"bgweb-api/internal/openapi"
 	"embed"
 	"encoding/json"
 	"fmt"
@@ -35,12 +36,7 @@ func main() {
 }
 
 func getMoves(this js.Value, input []js.Value) interface{} {
-	var args = api.MoveArgs{
-		Player:     "x",
-		MaxMoves:   0,
-		ScoreMoves: true,
-		Cubeful:    false,
-	}
+	var args openapi.MoveArgs
 
 	if err := json.Unmarshal([]byte(input[0].String()), &args); err != nil {
 		return fmt.Sprintf("{\"error\": \"%v\"}", err.Error())
