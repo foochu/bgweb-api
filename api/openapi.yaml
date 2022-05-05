@@ -1,0 +1,283 @@
+openapi: 3.0.0
+info:
+  title: Backgammon Web API
+  version: 1.0.0
+  description: Calculate best moves for a given Backgammon position
+servers:
+  - url: /api/v1
+    description: Default server
+
+paths:
+  /getmoves:
+    post:
+      summary: Get moves
+      description: Get moves for a given board layout and dice roll
+      tags:
+        - GameAnalysis
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MoveArgs"
+      responses:
+        "200":
+          description: OK
+          content:
+            "application/json":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Move"
+
+components:
+  schemas:
+    MoveArgs:
+      type: object
+      required:
+        - board
+        - dice
+        - player
+      properties:
+        board:
+          $ref: "#/components/schemas/Board"
+        cubeful:
+          type: boolean
+          description: Is doubling cube in use?
+          default: false
+        dice:
+          type: array
+          description: 2-slot array of dice values been thrown
+          items:
+            type: integer
+            minimum: 1
+            maximum: 6
+          minItems: 2
+          maxItems: 2
+          example: [3, 1]
+        max-moves:
+          type: integer
+          description: Max number of moves to return. if not supplied means return all available moves.
+          minimum: 0
+          example: 3
+        player:
+          type: string
+          description: Player on roll
+          enum: [x, o]
+          example: x
+        score-moves:
+          type: boolean
+          description: Whether or not to calculate equities for each available move. Takes longer.
+          default: true
+    Board:
+      type: object
+      required:
+        - o
+        - x
+      properties:
+        o:
+          $ref: "#/components/schemas/CheckerLayout"
+        x:
+          $ref: "#/components/schemas/CheckerLayout"
+    CheckerLayout:
+      type: object
+      description: Number of checkers in each point on the board.
+      properties:
+        "1":
+          type: integer
+        "2":
+          type: integer
+        "3":
+          type: integer
+        "4":
+          type: integer
+        "5":
+          type: integer
+        "6":
+          type: integer
+        "7":
+          type: integer
+        "8":
+          type: integer
+        "9":
+          type: integer
+        "10":
+          type: integer
+        "11":
+          type: integer
+        "12":
+          type: integer
+        "13":
+          type: integer
+        "14":
+          type: integer
+        "15":
+          type: integer
+        "16":
+          type: integer
+        "17":
+          type: integer
+        "18":
+          type: integer
+        "19":
+          type: integer
+        "20":
+          type: integer
+        "21":
+          type: integer
+        "22":
+          type: integer
+        "23":
+          type: integer
+        "24":
+          type: integer
+        bar:
+          type: integer
+      example:
+        "6": 5
+        "8": 3
+        "13": 5
+        "24": 2
+    Move:
+      type: object
+      description: Backgammon move
+      properties:
+        evaluation:
+          $ref: "#/components/schemas/Evaluation"
+        play:
+          type: array
+          items:
+            $ref: "#/components/schemas/CheckerPlay"
+    CheckerPlay:
+      type: object
+      required:
+        - to
+        - from
+      description: Move coordinates
+      properties:
+        from:
+          type: string
+          description: Point where the checker is currently
+          enum:
+            - "1"
+            - "2"
+            - "3"
+            - "4"
+            - "5"
+            - "6"
+            - "7"
+            - "8"
+            - "9"
+            - "10"
+            - "11"
+            - "12"
+            - "13"
+            - "14"
+            - "15"
+            - "16"
+            - "17"
+            - "18"
+            - "19"
+            - "20"
+            - "21"
+            - "22"
+            - "23"
+            - "24"
+            - bar
+        to:
+          type: string
+          description: Point where the checker will move
+          enum:
+            - "1"
+            - "2"
+            - "3"
+            - "4"
+            - "5"
+            - "6"
+            - "7"
+            - "8"
+            - "9"
+            - "10"
+            - "11"
+            - "12"
+            - "13"
+            - "14"
+            - "15"
+            - "16"
+            - "17"
+            - "18"
+            - "19"
+            - "20"
+            - "21"
+            - "22"
+            - "23"
+            - "24"
+            - "off"
+    Evaluation:
+      type: object
+      required:
+        - eq
+        - diff
+      description: Score of the move
+      properties:
+        eq:
+          type: number
+          description: Equity value of the move relative to zero (neutral)
+          example: 0.159
+        diff:
+          type: number
+          description: Equity difference compared to the best move
+          example: 0
+        info:
+          $ref: "#/components/schemas/EvalInfo"
+        probability:
+          $ref: "#/components/schemas/Probability"
+    EvalInfo:
+      type: object
+      required:
+        - cubeful
+        - plies
+      description: Evaluation details
+      properties:
+        cubeful:
+          type: boolean
+          description: Was cube decision considered?
+          example: false
+        plies:
+          type: integer
+          description: How many turns ahead was considered. Typically 3, but may terminate earlier if probabilty already looks certain.
+          example: 3
+    Probability:
+      type: object
+      required:
+        - win
+        - winG
+        - winBG
+        - lose
+        - loseG
+        - loseBG
+      description: Probabilty of win/lose after making this move. Values are percentage proportions of 1, i.e. 1 means 100% certainty, 0.5 means 50% etc.
+      properties:
+        win:
+          type: number
+          description: Probabilty of winning the game
+          example: 0.497
+        winG:
+          type: number
+          description: Probability of winning a gammon
+          example: 0.137
+        winBG:
+          type: number
+          description: Probability of winning a backgammon
+          example: 0.008
+        lose:
+          type: number
+          description: Probabilty of losing the game. Always `1 - win`
+          example: 0.503
+        loseG:
+          type: number
+          description: Probabilty of losing a gammon
+          example: 0.140
+        loseBG:
+          type: number
+          description: Probabilty of losing a backgammon
+          example: 0.007

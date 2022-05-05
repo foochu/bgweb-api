@@ -2,6 +2,7 @@ package api
 
 import (
 	"bgweb-api/internal/gnubg"
+	"bgweb-api/internal/openapi"
 	"os"
 	"reflect"
 	"sync"
@@ -19,149 +20,197 @@ func setup() {
 func TestGetMoves(t *testing.T) {
 	once.Do(setup)
 	type args struct {
-		args MoveArgs
+		args openapi.MoveArgs
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    []Move
+		want    []openapi.Move
 		wantErr bool
 	}{
 		{
 			name: "should get 3-1 with scores",
-			args: args{MoveArgs{
-				Board: Board{
-					X: CheckerLayout{P6: 5, P8: 3, P13: 5, P24: 2},
-					O: CheckerLayout{P6: 5, P8: 3, P13: 5, P24: 2},
+			args: args{openapi.MoveArgs{
+				Board: openapi.Board{
+					X: openapi.CheckerLayout{N6: toPtr(5), N8: toPtr(3), N13: toPtr(5), N24: toPtr(2)},
+					O: openapi.CheckerLayout{N6: toPtr(5), N8: toPtr(3), N13: toPtr(5), N24: toPtr(2)},
 				},
-				Dice:       [2]int{3, 1},
+				Dice:       []int{3, 1},
 				Player:     "x",
-				MaxMoves:   9,
-				ScoreMoves: true,
-				Cubeful:    true,
+				MaxMoves:   toPtr(3),
+				ScoreMoves: toPtr(true),
+				Cubeful:    toPtr(true),
 			}},
-			want: []Move{
-				{Play: []CheckerPlay{{"8", "5"}, {"6", "5"}}, Evaluation: &Evaluation{Info: EvalInfo{Cubeful: true, Plies: 1}, Equity: 0.218, EquityDiff: 0, Probablity: Probablity{0.551, 0.174, 0.013, 0.449, 0.124, 0.005}}},
-				{Play: []CheckerPlay{{"13", "10"}, {"24", "23"}}, Evaluation: &Evaluation{Info: EvalInfo{Cubeful: true, Plies: 1}, Equity: -0.012, EquityDiff: -0.23, Probablity: Probablity{0.497, 0.137, 0.008, 0.503, 0.14, 0.007}}},
-				{Play: []CheckerPlay{{"24", "21"}, {"21", "20"}}, Evaluation: &Evaluation{Info: EvalInfo{Cubeful: true, Plies: 1}, Equity: -0.020, EquityDiff: -0.239, Probablity: Probablity{0.497, 0.125, 0.005, 0.503, 0.135, 0.004}}},
-				{Play: []CheckerPlay{{"24", "21"}, {"24", "23"}}, Evaluation: &Evaluation{Info: EvalInfo{Cubeful: true, Plies: 1}, Equity: -0.026, EquityDiff: -0.244, Probablity: Probablity{0.495, 0.123, 0.005, 0.505, 0.135, 0.004}}},
-				{Play: []CheckerPlay{{"13", "10"}, {"10", "9"}}, Evaluation: &Evaluation{Info: EvalInfo{Cubeful: true, Plies: 1}, Equity: -0.026, EquityDiff: -0.244, Probablity: Probablity{0.491, 0.143, 0.009, 0.509, 0.143, 0.008}}},
-				{Play: []CheckerPlay{{"24", "21"}, {"6", "5"}}, Evaluation: &Evaluation{Info: EvalInfo{Cubeful: true, Plies: 1}, Equity: -0.049, EquityDiff: -0.267, Probablity: Probablity{0.493, 0.125, 0.007, 0.507, 0.146, 0.007}}},
-				{Play: []CheckerPlay{{"13", "10"}, {"6", "5"}}, Evaluation: &Evaluation{Info: EvalInfo{Cubeful: true, Plies: 1}, Equity: -0.053, EquityDiff: -0.271, Probablity: Probablity{0.489, 0.138, 0.01, 0.511, 0.154, 0.012}}},
-				{Play: []CheckerPlay{{"6", "3"}, {"24", "23"}}, Evaluation: &Evaluation{Info: EvalInfo{Cubeful: true, Plies: 1}, Equity: -0.108, EquityDiff: -0.326, Probablity: Probablity{0.477, 0.125, 0.007, 0.523, 0.157, 0.008}}},
-				{Play: []CheckerPlay{{"8", "5"}, {"24", "23"}}, Evaluation: &Evaluation{Info: EvalInfo{Cubeful: true, Plies: 1}, Equity: -0.109, EquityDiff: -0.328, Probablity: Probablity{0.477, 0.124, 0.007, 0.523, 0.156, 0.009}}},
+			want: []openapi.Move{
+				{
+					Play: &[]openapi.CheckerPlay{{From: "8", To: "5"}, {From: "6", To: "5"}},
+					Evaluation: &openapi.Evaluation{
+						Info:        &openapi.EvalInfo{Cubeful: true, Plies: 1},
+						Eq:          0.218,
+						Diff:        0,
+						Probability: &openapi.Probability{Win: 0.551, WinG: 0.174, WinBG: 0.013, Lose: 0.449, LoseG: 0.124, LoseBG: 0.005},
+					},
+				},
+				{
+					Play: &[]openapi.CheckerPlay{{From: "13", To: "10"}, {From: "24", To: "23"}},
+					Evaluation: &openapi.Evaluation{
+						Info:        &openapi.EvalInfo{Cubeful: true, Plies: 1},
+						Eq:          -0.012,
+						Diff:        -0.23,
+						Probability: &openapi.Probability{Win: 0.497, WinG: 0.137, WinBG: 0.008, Lose: 0.503, LoseG: 0.14, LoseBG: 0.007},
+					},
+				},
+				{
+					Play: &[]openapi.CheckerPlay{{From: "24", To: "21"}, {From: "21", To: "20"}},
+					Evaluation: &openapi.Evaluation{
+						Info:        &openapi.EvalInfo{Cubeful: true, Plies: 1},
+						Eq:          -0.020,
+						Diff:        -0.239,
+						Probability: &openapi.Probability{Win: 0.497, WinG: 0.125, WinBG: 0.005, Lose: 0.503, LoseG: 0.135, LoseBG: 0.004},
+					},
+				},
 			},
 			wantErr: false,
 		},
 		{
 			name: "should get 3-1 without scores",
-			args: args{MoveArgs{
-				Board: Board{
-					O: CheckerLayout{P6: 5, P8: 3, P13: 5, P24: 2},
-					X: CheckerLayout{P6: 5, P8: 3, P13: 5, P24: 2},
+			args: args{openapi.MoveArgs{
+				Board: openapi.Board{
+					O: openapi.CheckerLayout{N6: toPtr(5), N8: toPtr(3), N13: toPtr(5), N24: toPtr(2)},
+					X: openapi.CheckerLayout{N6: toPtr(5), N8: toPtr(3), N13: toPtr(5), N24: toPtr(2)},
 				},
-				Dice:       [2]int{3, 1},
+				Dice:       []int{3, 1},
 				Player:     "x",
-				MaxMoves:   9,
-				ScoreMoves: false,
+				MaxMoves:   toPtr(3),
+				ScoreMoves: toPtr(false),
 			}},
-			want: []Move{
-				{Play: []CheckerPlay{{"24", "21"}, {"24", "23"}}},
-				{Play: []CheckerPlay{{"24", "21"}, {"21", "20"}}},
-				{Play: []CheckerPlay{{"24", "21"}, {"8", "7"}}},
-				{Play: []CheckerPlay{{"24", "21"}, {"6", "5"}}},
-				{Play: []CheckerPlay{{"13", "10"}, {"24", "23"}}},
-				{Play: []CheckerPlay{{"13", "10"}, {"10", "9"}}},
-				{Play: []CheckerPlay{{"13", "10"}, {"8", "7"}}},
-				{Play: []CheckerPlay{{"13", "10"}, {"6", "5"}}},
-				{Play: []CheckerPlay{{"8", "5"}, {"24", "23"}}},
+			want: []openapi.Move{
+				{Play: &[]openapi.CheckerPlay{{From: "24", To: "21"}, {From: "24", To: "23"}}},
+				{Play: &[]openapi.CheckerPlay{{From: "24", To: "21"}, {From: "21", To: "20"}}},
+				{Play: &[]openapi.CheckerPlay{{From: "24", To: "21"}, {From: "8", To: "7"}}},
 			},
 			wantErr: false,
 		},
 		{
 			name: "should consider player on bar",
-			args: args{MoveArgs{
-				Board: Board{
-					O: CheckerLayout{P6: 5, P8: 4, P13: 4, P15: 1, P24: 1},
-					X: CheckerLayout{P6: 5, P7: 2, P8: 3, P13: 2, P24: 2, Bar: 1},
+			args: args{openapi.MoveArgs{
+				Board: openapi.Board{
+					O: openapi.CheckerLayout{N6: toPtr(5), N8: toPtr(4), N13: toPtr(4), N15: toPtr(1), N24: toPtr(1)},
+					X: openapi.CheckerLayout{N6: toPtr(5), N7: toPtr(2), N8: toPtr(3), N13: toPtr(2), N24: toPtr(2), Bar: toPtr(1)},
 				},
-				Dice:       [2]int{6, 1},
+				Dice:       []int{6, 1},
 				Player:     "x",
-				MaxMoves:   9,
-				ScoreMoves: false,
+				MaxMoves:   toPtr(9),
+				ScoreMoves: toPtr(false),
 			}},
-			want: []Move{
-				{Play: []CheckerPlay{{"bar", "24"}, {"24", "18"}}},
-				{Play: []CheckerPlay{{"bar", "24"}, {"13", "7"}}},
-				{Play: []CheckerPlay{{"bar", "24"}, {"8", "2"}}},
-				{Play: []CheckerPlay{{"bar", "24"}, {"7", "1"}}},
+			want: []openapi.Move{
+				{Play: &[]openapi.CheckerPlay{{From: "bar", To: "24"}, {From: "24", To: "18"}}},
+				{Play: &[]openapi.CheckerPlay{{From: "bar", To: "24"}, {From: "13", To: "7"}}},
+				{Play: &[]openapi.CheckerPlay{{From: "bar", To: "24"}, {From: "8", To: "2"}}},
+				{Play: &[]openapi.CheckerPlay{{From: "bar", To: "24"}, {From: "7", To: "1"}}},
 			},
 			wantErr: false,
 		},
 		{
 			name: "should bear off",
-			args: args{MoveArgs{
-				Board: Board{
-					X: CheckerLayout{P1: 1},
-					O: CheckerLayout{P2: 1},
+			args: args{openapi.MoveArgs{
+				Board: openapi.Board{
+					X: openapi.CheckerLayout{N1: toPtr(1)},
+					O: openapi.CheckerLayout{N2: toPtr(1)},
 				},
-				Dice:       [2]int{6, 1},
+				Dice:       []int{6, 1},
 				Player:     "x",
-				MaxMoves:   9,
-				ScoreMoves: false,
+				MaxMoves:   toPtr(9),
+				ScoreMoves: toPtr(false),
 			}},
-			want: []Move{
-				{Play: []CheckerPlay{{"1", "off"}}},
+			want: []openapi.Move{
+				{Play: &[]openapi.CheckerPlay{{From: "1", To: "off"}}},
 			},
 			wantErr: false,
 		},
 		{
 			name: "should save gammon",
-			args: args{MoveArgs{
-				Board: Board{
-					X: CheckerLayout{P1: 1},
-					O: CheckerLayout{P1: 4, P2: 3, P3: 1, P4: 2, P5: 2, P6: 3},
+			args: args{openapi.MoveArgs{
+				Board: openapi.Board{
+					X: openapi.CheckerLayout{N1: toPtr(1)},
+					O: openapi.CheckerLayout{N1: toPtr(4), N2: toPtr(3), N3: toPtr(1), N4: toPtr(2), N5: toPtr(2), N6: toPtr(3)},
 				},
-				Dice:       [2]int{4, 1},
+				Dice:       []int{4, 1},
 				Player:     "o",
-				MaxMoves:   9,
-				ScoreMoves: true,
+				MaxMoves:   toPtr(3),
+				ScoreMoves: toPtr(true),
 			}},
-			want: []Move{
-				{Play: []CheckerPlay{{"4", "off"}, {"3", "2"}}, Evaluation: &Evaluation{Info: EvalInfo{Cubeful: false, Plies: 3}, Equity: -1, EquityDiff: 0, Probablity: Probablity{0, 0, 0, 1, 0, 0}}},
-				{Play: []CheckerPlay{{"4", "off"}, {"6", "5"}}, Evaluation: &Evaluation{Info: EvalInfo{Cubeful: false, Plies: 3}, Equity: -1, EquityDiff: 0, Probablity: Probablity{0, 0, 0, 1, 0, 0}}},
-				{Play: []CheckerPlay{{"6", "2"}, {"1", "off"}}, Evaluation: &Evaluation{Info: EvalInfo{Cubeful: false, Plies: 3}, Equity: -1, EquityDiff: 0, Probablity: Probablity{0, 0, 0, 1, 0, 0}}},
-				{Play: []CheckerPlay{{"4", "off"}, {"2", "1"}}, Evaluation: &Evaluation{Info: EvalInfo{Cubeful: false, Plies: 3}, Equity: -1, EquityDiff: 0, Probablity: Probablity{0, 0, 0, 1, 0, 0}}},
-				{Play: []CheckerPlay{{"5", "1"}, {"1", "off"}}, Evaluation: &Evaluation{Info: EvalInfo{Cubeful: false, Plies: 3}, Equity: -1, EquityDiff: 0, Probablity: Probablity{0, 0, 0, 1, 0, 0}}},
-				{Play: []CheckerPlay{{"4", "off"}, {"1", "off"}}, Evaluation: &Evaluation{Info: EvalInfo{Cubeful: false, Plies: 3}, Equity: -1, EquityDiff: 0, Probablity: Probablity{0, 0, 0, 1, 0, 0}}},
-				{Play: []CheckerPlay{{"4", "off"}, {"4", "3"}}, Evaluation: &Evaluation{Info: EvalInfo{Cubeful: false, Plies: 3}, Equity: -1, EquityDiff: 0, Probablity: Probablity{0, 0, 0, 1, 0, 0}}},
-				{Play: []CheckerPlay{{"6", "2"}, {"4", "3"}}, Evaluation: &Evaluation{Info: EvalInfo{Cubeful: false, Plies: 1}, Equity: -2, EquityDiff: -1, Probablity: Probablity{0, 0, 0, 1, 1, 0}}},
-				{Play: []CheckerPlay{{"6", "2"}, {"2", "1"}}, Evaluation: &Evaluation{Info: EvalInfo{Cubeful: false, Plies: 1}, Equity: -2, EquityDiff: -1, Probablity: Probablity{0, 0, 0, 1, 1, 0}}},
+			want: []openapi.Move{
+				{
+					Play: &[]openapi.CheckerPlay{{From: "4", To: "off"}, {From: "3", To: "2"}},
+					Evaluation: &openapi.Evaluation{
+						Info:        &openapi.EvalInfo{Cubeful: false, Plies: 3},
+						Eq:          -1,
+						Diff:        0,
+						Probability: &openapi.Probability{Win: 0, WinG: 0, WinBG: 0, Lose: 1, LoseG: 0, LoseBG: 0},
+					},
+				},
+				{
+					Play: &[]openapi.CheckerPlay{{From: "4", To: "off"}, {From: "6", To: "5"}},
+					Evaluation: &openapi.Evaluation{
+						Info:        &openapi.EvalInfo{Cubeful: false, Plies: 3},
+						Eq:          -1,
+						Diff:        0,
+						Probability: &openapi.Probability{Win: 0, WinG: 0, WinBG: 0, Lose: 1, LoseG: 0, LoseBG: 0},
+					},
+				},
+				{
+					Play: &[]openapi.CheckerPlay{{From: "6", To: "2"}, {From: "1", To: "off"}},
+					Evaluation: &openapi.Evaluation{
+						Info:        &openapi.EvalInfo{Cubeful: false, Plies: 3},
+						Eq:          -1,
+						Diff:        0,
+						Probability: &openapi.Probability{Win: 0, WinG: 0, WinBG: 0, Lose: 1, LoseG: 0, LoseBG: 0},
+					},
+				},
 			},
 			wantErr: false,
 		},
 		{
 			name: "should score x",
-			args: args{MoveArgs{
-				Board: Board{
-					X: CheckerLayout{P6: 5, P8: 4, P13: 4, P23: 1, P24: 1},
-					O: CheckerLayout{P6: 5, P8: 3, P13: 5, P21: 1, P24: 1},
+			args: args{openapi.MoveArgs{
+				Board: openapi.Board{
+					X: openapi.CheckerLayout{N6: toPtr(5), N8: toPtr(4), N13: toPtr(4), N23: toPtr(1), N24: toPtr(1)},
+					O: openapi.CheckerLayout{N6: toPtr(5), N8: toPtr(3), N13: toPtr(5), N21: toPtr(1), N24: toPtr(1)},
 				},
-				Dice:       [2]int{6, 5},
+				Dice:       []int{6, 5},
 				Player:     "x",
-				MaxMoves:   9,
-				ScoreMoves: true,
+				MaxMoves:   toPtr(3),
+				ScoreMoves: toPtr(true),
 			}},
-			want: []Move{
-				{Play: []CheckerPlay{{"24", "18"}, {"23", "18"}}, Evaluation: &Evaluation{Info: EvalInfo{Cubeful: false, Plies: 3}, Equity: 0.159, EquityDiff: 0, Probablity: Probablity{0.564, 0.108, 0.003, 0.436, 0.078, 0.001}}},
-				{Play: []CheckerPlay{{"24", "18"}, {"18", "13"}}, Evaluation: &Evaluation{Info: EvalInfo{Cubeful: false, Plies: 3}, Equity: 0.044, EquityDiff: -0.115, Probablity: Probablity{0.527, 0.109, 0.002, 0.473, 0.118, 0.003}}},
-				{Play: []CheckerPlay{{"24", "18"}, {"13", "8"}}, Evaluation: &Evaluation{Info: EvalInfo{Cubeful: false, Plies: 3}, Equity: -0.013, EquityDiff: -0.172, Probablity: Probablity{0.5, 0.124, 0.005, 0.5, 0.136, 0.004}}},
-				{Play: []CheckerPlay{{"24", "18"}, {"6", "1"}}, Evaluation: &Evaluation{Info: EvalInfo{Cubeful: false, Plies: 1}, Equity: -0.056, EquityDiff: -0.215, Probablity: Probablity{0.483, 0.116, 0.003, 0.517, 0.136, 0.006}}},
-				{Play: []CheckerPlay{{"13", "7"}, {"6", "1"}}, Evaluation: &Evaluation{Info: EvalInfo{Cubeful: false, Plies: 1}, Equity: -0.057, EquityDiff: -0.216, Probablity: Probablity{0.476, 0.128, 0.005, 0.524, 0.134, 0.008}}},
-				{Play: []CheckerPlay{{"13", "7"}, {"7", "2"}}, Evaluation: &Evaluation{Info: EvalInfo{Cubeful: false, Plies: 1}, Equity: -0.086, EquityDiff: -0.245, Probablity: Probablity{0.466, 0.126, 0.005, 0.534, 0.141, 0.007}}},
-				{Play: []CheckerPlay{{"8", "2"}, {"23", "18"}}, Evaluation: &Evaluation{Info: EvalInfo{Cubeful: false, Plies: 1}, Equity: -0.105, EquityDiff: -0.264, Probablity: Probablity{0.466, 0.116, 0.004, 0.534, 0.151, 0.007}}},
-				{Play: []CheckerPlay{{"13", "7"}, {"23", "18"}}, Evaluation: &Evaluation{Info: EvalInfo{Cubeful: false, Plies: 1}, Equity: -0.106, EquityDiff: -0.265, Probablity: Probablity{0.465, 0.115, 0.004, 0.535, 0.148, 0.007}}},
-				{Play: []CheckerPlay{{"24", "18"}, {"8", "3"}}, Evaluation: &Evaluation{Info: EvalInfo{Cubeful: false, Plies: 1}, Equity: -0.108, EquityDiff: -0.267, Probablity: Probablity{0.466, 0.116, 0.004, 0.534, 0.152, 0.007}}},
+			want: []openapi.Move{
+				{
+					Play: &[]openapi.CheckerPlay{{From: "24", To: "18"}, {From: "23", To: "18"}},
+					Evaluation: &openapi.Evaluation{
+						Info:        &openapi.EvalInfo{Cubeful: false, Plies: 3},
+						Eq:          0.159,
+						Diff:        0,
+						Probability: &openapi.Probability{Win: 0.564, WinG: 0.108, WinBG: 0.003, Lose: 0.436, LoseG: 0.078, LoseBG: 0.001},
+					},
+				},
+				{
+					Play: &[]openapi.CheckerPlay{{From: "24", To: "18"}, {From: "18", To: "13"}},
+					Evaluation: &openapi.Evaluation{
+						Info:        &openapi.EvalInfo{Cubeful: false, Plies: 3},
+						Eq:          0.044,
+						Diff:        -0.115,
+						Probability: &openapi.Probability{Win: 0.527, WinG: 0.109, WinBG: 0.002, Lose: 0.473, LoseG: 0.118, LoseBG: 0.003},
+					},
+				},
+				{
+					Play: &[]openapi.CheckerPlay{{From: "24", To: "18"}, {From: "13", To: "8"}},
+					Evaluation: &openapi.Evaluation{
+						Info:        &openapi.EvalInfo{Cubeful: false, Plies: 3},
+						Eq:          -0.013,
+						Diff:        -0.172,
+						Probability: &openapi.Probability{Win: 0.5, WinG: 0.124, WinBG: 0.005, Lose: 0.5, LoseG: 0.136, LoseBG: 0.004},
+					},
+				},
 			},
 			wantErr: false,
 		},
@@ -178,8 +227,11 @@ func TestGetMoves(t *testing.T) {
 				return
 			}
 			for i, m := range tt.want {
-				if !reflect.DeepEqual(got[i], m) {
-					t.Errorf("GetMoves(%d) = %v (%v), want %v (%v)", i, got[i], got[i].Evaluation, m, m.Evaluation)
+				if !reflect.DeepEqual(got[i].Play, m.Play) {
+					t.Errorf("GetMoves(%d).Play = %v, want %v}", i, got[i].Play, m.Play)
+				}
+				if !reflect.DeepEqual(got[i].Evaluation, m.Evaluation) {
+					t.Errorf("GetMoves(%d).Evaluation = %v, want %v", i, got[i].Evaluation, m.Evaluation)
 				}
 			}
 		})

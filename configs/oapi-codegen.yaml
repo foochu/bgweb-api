@@ -1,0 +1,6 @@
+output: internal/openapi/generated_code.go
+package: openapi
+generate:
+  - types
+  - server
+  - spec

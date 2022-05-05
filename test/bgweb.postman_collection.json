@@ -1,0 +1,39 @@
+{
+	"info": {
+		"_postman_id": "07d9f1c0-68c5-431d-9bfa-3b53626cf8b2",
+		"name": "bgweb",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Smoke test",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"board\": {\n    \"o\": {\n      \"6\": 5,\n      \"8\": 3,\n      \"13\": 5,\n      \"24\": 2\n    },\n    \"x\": {\n      \"6\": 5,\n      \"8\": 3,\n      \"13\": 5,\n      \"24\": 2\n    }\n  },\n  \"cubeful\": false,\n  \"dice\": [3, 1],\n  \"max-moves\": 3,\n  \"player\": \"x\",\n  \"score-moves\": true\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/getmoves",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"getmoves"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

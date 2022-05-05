@@ -44,6 +44,33 @@ go run ./cmd/bgweb-api
 # 4 - browse to http://localhost:8080
 ```
 
+### Run tests
+
+Run all unit tests:
+
+```sh
+go test -v ./internal/...
+```
+
+Run a Postman smoke test collection with Newman CLI:
+
+```sh
+# install Node.js >= 10
+
+# start the HTTP server as per instruction above
+
+# run the collection, should pass
+npx newman run ./test/bgweb.postman_collection.json
+```
+
+### Re-generating boilerplate code from OpenAPI spec
+
+After modifying `api/openapi.yaml` run the following command to update generated types & routes:
+
+```sh
+oapi-codegen --config configs/oapi-codegen.yaml api/openapi.yaml
+```
+
 ## Get best moves
 
 ### Parameters
@@ -205,11 +232,9 @@ In your web app:
 ```js
 const go = new Go();
 
-WebAssembly.instantiateStreaming(fetch("lib.wasm"), go.importObject).then(
-  async (result) => {
-    await go.run(result.instance);
-  }
-);
+WebAssembly.instantiateStreaming(fetch("lib.wasm"), go.importObject).then(async (result) => {
+  await go.run(result.instance);
+});
 ```
 
 Web Assembly declares global JS function `wasm_get_moves()`. Example usage:
